@@ -4441,7 +4441,7 @@ async function submit(form){
  try{
   if(files.length){
    const post=document.createElement('form');post.action='https://formsubmit.co/'+TO;post.method='POST';post.enctype='multipart/form-data';post.target='_self';post.hidden=true;
-   data['_next']=location.origin+location.pathname+'?v=20261027-mail1&request=received';
+   data['_next']=location.origin+location.pathname+'?v=20261027-lang1&request=received&lang='+encodeURIComponent(document.documentElement.lang||'ko');
    for(const [name,value] of Object.entries(data)){const input=document.createElement('input');input.type='hidden';input.name=name;input.value=value;post.append(input);}
    form.querySelectorAll('input[type=file]').forEach((input,index)=>{if(input.files.length){input.name=index?'attachment'+index:'attachment';post.append(input);}});
    document.body.append(post);post.submit();return;
