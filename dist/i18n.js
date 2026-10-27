@@ -31,6 +31,7 @@ function ignored(node){const parent=node.parentElement;return !parent||parent.cl
 const visualDisplay=new WeakMap();
 function syncVisuals(){
  const captions={
+  '38c9884106ecb.png':'지금 체온측정의 혁신을 경험해보세요.',
   '4d329332b0231.png':'지금 체온측정의 혁신을 경험해보세요.',
   '7111a01557c16.png':'지금 체온측정의 혁신을 경험해보세요.',
   'c623fb450cff1.png':'지금 체온측정의 혁신을 경험해보세요.',
