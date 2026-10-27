@@ -22,11 +22,43 @@ const style=document.createElement('style');style.textContent=`
 .translated-visual{display:none;text-align:center;padding:30px 12px;font:700 clamp(26px,3.7vw,48px)/1.3 Arial,sans-serif;color:#132e37}.translated-visual strong{color:#1aa4b9}html[data-language="en"] .translatable-visual>._widget_data,html[data-language="vi"] .translatable-visual>._widget_data{display:none!important}html[data-language="en"] .translated-visual,html[data-language="vi"] .translated-visual{display:block}
 html[data-language="en"] .fr-view,html[data-language="vi"] .fr-view{font-family:Arial,sans-serif!important}html[data-language="en"] .text-table,html[data-language="vi"] .text-table{height:auto!important}html[data-language="en"] .text-table span,html[data-language="vi"] .text-table span{white-space:normal!important;word-break:normal!important;overflow-wrap:break-word}html[data-language="en"] .section_wrap h2,html[data-language="vi"] .section_wrap h2{font-size:clamp(28px,3.8vw,52px)!important;line-height:1.25!important}html[data-language="en"] span[style*="font-size: 48px"],html[data-language="vi"] span[style*="font-size: 48px"]{font-size:clamp(25px,3.2vw,42px)!important}html[data-language="en"] .dropdown-menu,html[data-language="vi"] .dropdown-menu{min-width:210px}
 @media(max-width:767px){.language-switcher{top:114px;bottom:auto;right:10px;min-width:0;padding:7px;border-radius:11px}.language-switcher .language-label{display:none}.language-switcher button{font-size:12px;padding:7px 9px}.language-switcher .return-korean{padding-top:4px}html[data-language="en"] .section_wrap .text-table,html[data-language="vi"] .section_wrap .text-table{height:auto!important}.translated-visual{padding:22px 10px;font-size:27px}}
+`;style.textContent+=`
+.phonenumber_wrap{display:flex!important;align-items:center;gap:6px;flex-wrap:nowrap!important}.phonenumber_wrap input.form-control{flex:0 1 70px!important;width:70px!important;min-width:0!important;display:inline-block!important}.phonenumber_wrap .line{flex:0 0 auto!important}
 `;document.head.append(style);
 const panel=document.createElement('nav');panel.className='language-switcher';panel.dataset.noTranslate='true';panel.setAttribute('aria-label','Language / Ngôn ngữ');panel.innerHTML='<span class="language-label">LANGUAGE / NGÔN NGỮ</span><div class="language-options"><button type="button" data-language-choice="en" lang="en" aria-pressed="false">English</button><button type="button" data-language-choice="vi" lang="vi" aria-pressed="false">Tiếng Việt</button></div><button type="button" class="return-korean" data-language-choice="ko" lang="ko" hidden>한국어</button>';document.body.append(panel);
 function ignored(node){const parent=node.parentElement;return !parent||parent.closest('script,style,textarea,input,[data-no-translate],.notranslate');}
+
+const visualDisplay=new WeakMap();
+function syncVisuals(){
+ const captions={
+  '4d329332b0231.png':'지금 체온측정의 혁신을 경험해보세요.',
+  '7111a01557c16.png':'지금 체온측정의 혁신을 경험해보세요.',
+  'c623fb450cff1.png':'지금 체온측정의 혁신을 경험해보세요.',
+  '13f5b4ac9d455.png':'전용 스캐너로 체온측정과 관리를 동시에'
+ };
+ for(const image of document.querySelectorAll('img[src]')){
+  const name=new URL(image.getAttribute('src'),document.baseURI).pathname.split('/').pop();
+  const caption=captions[name];if(!caption)continue;
+  const outer=image.closest('[doz_type="widget"]')||image.parentElement.parentElement;
+  const original=image.closest('._widget_data')||image.parentElement;
+  if(!outer||outer===original)continue;
+  outer.classList.add('translatable-visual');
+  let replacement=Array.from(outer.children).find(e=>e.classList.contains('translated-visual'));
+  if(!replacement){replacement=document.createElement('div');replacement.className='translated-visual';replacement.textContent=caption;outer.append(replacement);}
+  if(!visualDisplay.has(original))visualDisplay.set(original,{value:original.style.getPropertyValue('display'),priority:original.style.getPropertyPriority('display')});
+  if(language!=='ko'){
+   original.style.setProperty('display','none','important');
+   replacement.style.setProperty('display','block','important');
+  }else{
+   const prior=visualDisplay.get(original);if(prior.value)original.style.setProperty('display',prior.value,prior.priority);else original.style.removeProperty('display');
+   replacement.style.setProperty('display','none','important');
+  }
+ }
+}
+
 function translateTree(){
  observer.disconnect();
+ syncVisuals();
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let node;
  while(node=walker.nextNode()){
   if(ignored(node)||!norm(node.data))continue;
